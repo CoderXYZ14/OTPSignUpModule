@@ -49,3 +49,18 @@ userSchema.methods.generateAndSendOTP = async function (
 
   return otpCode;
 };
+
+userSchema.methods.verifyOTP = async function (inputOtp) {
+  const isOtpValid = await bcrypt.compare(inputOtp, this.otpHash);
+  const isExpired = this.otpExpires < Date.now();
+
+  if (isOtpValid && !isExpired) {
+    this.isVerified = true;
+    this.otpHash = undefined;
+    this.otpExpires = undefined;
+  }
+  return isOtpValid && !isExpired;
+};
+
+const User = mongoose.model("User", userSchema);
+export default User;
