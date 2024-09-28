@@ -1,13 +1,14 @@
 import { useState } from "react";
-import { Button } from "./components/ui/button";
+import { Header } from "./components-page";
+import { Outlet } from "react-router-dom";
 function App() {
   const [count, setCount] = useState(0);
 
   return (
-    <div className="text-3xl">
-      Hello
-      <Button>Click me</Button>
-    </div>
+    <>
+      <Header />
+      <Outlet />
+    </>
   );
 }
 
