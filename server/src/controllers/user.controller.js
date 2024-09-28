@@ -23,7 +23,7 @@ const generateAccessAndRefreshToken = async (userId) => {
     await user.save({ validateBeforeSave: false });
     return { accessToken, refreshToken };
   } catch (err) {
-    throw new Error(500, "Error generating access and refresh token");
+    throw new ApiError("Error generating access and refresh token", 500);
   }
 };
 
@@ -33,32 +33,36 @@ const requestOtp = asyncHandler(async (req, res) => {
   if (!success) {
     throw new ApiError("Please enter correct fields", 400);
   }
+
   const fullPhone = `${countryCode}${phone}`;
   const existingUser = await User.findOne({ phone: fullPhone });
   if (existingUser) {
-    throw new ApiError(409, "User already exists");
+    throw new ApiError("User already exists", 409);
   }
 
   const user = new User({ phone: fullPhone });
   const otp = await user.generateAndSendOTP(twilioClient, twilioPhoneNumber);
   await user.save();
   const createdUser = await User.findById(user._id);
-  if (!createdUser)
+
+  if (!createdUser) {
     throw new ApiError("Something went wrong while sending OTP", 500);
+  }
+
   res.status(200).json(new ApiResponse(200, { otp }, "OTP sent"));
 });
 
-//verify otp and register
+// Verify OTP and register
 const register = asyncHandler(async (req, res) => {
   const { phone, otp } = req.body;
   const { success } = verifyOtpSchema.safeParse(req.body);
-  if (!success) throw new ApiError(400, "Please enter correct fields");
+  if (!success) throw new ApiError("Please enter correct fields", 400);
 
   const user = await User.findOne({ phone });
-  if (!user) throw new ApiError(409, "No user existed");
+  if (!user) throw new ApiError("No user existed", 409);
 
   const verifyOtpSuccess = await user.verifyOTP(otp);
-  if (!verifyOtpSuccess) throw new ApiError(401, "Invalid OTP");
+  if (!verifyOtpSuccess) throw new ApiError("Invalid OTP", 401);
 
   await user.save();
 

@@ -1,4 +1,5 @@
 import Signin from "./signin/Signin";
 import Home from "./home/Home";
 import Header from "./header/Header";
-export { Signin, Home, Header };
+import VerifyOTP from "./verify-otp/VerifyOTP";
+export { Signin, Home, Header, VerifyOTP };
