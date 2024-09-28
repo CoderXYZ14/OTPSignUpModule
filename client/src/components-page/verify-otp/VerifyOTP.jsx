@@ -5,6 +5,11 @@ import {
   InputOTPSeparator,
   InputOTPSlot,
 } from "@/components/ui/input-otp";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import axios from "axios";
@@ -13,27 +18,18 @@ import { Heading, SubHeading } from "../extra-comp";
 import { useNavigate } from "react-router-dom";
 
 const VerifyOTP = () => {
-  const { phoneInfo } = useContext(PhoneInfoContext); // Access phoneInfo from context
-  const [otp, setOtp] = useState(""); // State to store the OTP
-  const [loading, setLoading] = useState(false); // State to manage loading
+  const { phoneInfo } = useContext(PhoneInfoContext);
+  const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isChecked, setIsChecked] = useState(false);
   const navigate = useNavigate();
 
-  // Check if phoneInfo exists, if not redirect to /sign-in
-  useEffect(() => {
-    if (!phoneInfo || !phoneInfo.phone) {
-      navigate("/sign-in");
-    }
-  }, [phoneInfo, navigate]);
-
-  // Extract phone and countryCode from phoneInfo
   const [phone, setPhone] = useState(phoneInfo?.phone || "");
   const [countryCode, setCountryCode] = useState(
     phoneInfo?.countryCode || "+1"
-  ); // Default country code if not present
+  );
 
-  const handleOtpChange = (value) => {
-    setOtp(value);
-  };
+  const handleOtpChange = (value) => setOtp(value);
 
   const verifyOtp = async () => {
     if (!otp) {
@@ -46,39 +42,32 @@ const VerifyOTP = () => {
       const response = await axios.post(
         "http://localhost:8080/api/v1/users/register",
         {
-          phone: `${countryCode}${phone}`, // Include country code with phone
+          phone: `${countryCode}${phone}`,
           otp,
         }
       );
 
       if (response.status === 200) {
         const { accessToken, refreshToken, user } = response.data.data;
-
-        // Store accessToken, refreshToken, and user info in localStorage
-        // localStorage.setItem("accessToken", accessToken);
-        // localStorage.setItem("refreshToken", refreshToken);
-        // localStorage.setItem("user", JSON.stringify(user));
-
-        navigate("/"); // Navigate to the home page after successful verification
+        navigate("/");
         console.log("OTP verified successfully");
       }
     } catch (error) {
       console.error(error);
-      // Display an error message if needed
     } finally {
       setLoading(false);
     }
   };
 
+  const handleCheckboxChange = (event) => setIsChecked(event.target.checked);
+
   return (
-    <div className="bg-slate-300 h-screen flex justify-center items-center">
-      <div className="flex flex-col justify-center">
-        <div className="rounded-lg bg-white w-[500px] text-center p-2 h-max px-4">
-          <Heading label={"Verify OTP"} />
-          <SubHeading
-            label={`Enter the OTP sent to ${countryCode} ${phone}`}
-          />{" "}
-          {/* Display country code with phone number */}
+    <div className="bg-slate-300 min-h-screen flex items-center justify-center p-4">
+      <div className="rounded-lg bg-white w-full max-w-md p-6 text-center shadow-md">
+        <Heading label="Verify OTP" />
+        <SubHeading label={`Enter the OTP sent to ${countryCode} ${phone}`} />
+
+        <div className="mt-4 flex justify-center">
           <InputOTP maxLength={6} onChange={handleOtpChange}>
             <InputOTPGroup>
               <InputOTPSlot index={0} />
@@ -90,15 +79,39 @@ const VerifyOTP = () => {
               <InputOTPSlot index={3} />
             </InputOTPGroup>
           </InputOTP>
-          <div className="flex items-center space-x-2 mt-4">
-            <div className="pt-4">
-              <div className="flex justify-end gap-5">
-                <Button disabled={!otp || loading} onClick={verifyOtp}>
-                  {loading ? <Loader2 className="animate-spin" /> : "Verify"}
-                </Button>
-              </div>
-            </div>
-          </div>
+        </div>
+
+        <div className="flex items-center justify-center space-x-2 mt-4">
+          <input
+            type="checkbox"
+            id="otpCheckbox"
+            checked={isChecked}
+            onChange={handleCheckboxChange}
+            className="cursor-pointer"
+          />
+          <HoverCard>
+            <HoverCardTrigger asChild>
+              <label
+                htmlFor="otpCheckbox"
+                className="cursor-pointer text-sm text-gray-600"
+              >
+                Terms & Conditions
+              </label>
+            </HoverCardTrigger>
+            <HoverCardContent className="w-64">
+              Please read and accept our terms and conditions before proceeding.
+            </HoverCardContent>
+          </HoverCard>
+        </div>
+
+        <div className="flex justify-center mt-6">
+          <Button
+            className="w-full max-w-xs"
+            disabled={!otp || loading || !isChecked}
+            onClick={verifyOtp}
+          >
+            {loading ? <Loader2 className="animate-spin" /> : "Verify"}
+          </Button>
         </div>
       </div>
     </div>

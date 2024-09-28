@@ -55,25 +55,35 @@ const requestOtp = asyncHandler(async (req, res) => {
 // Verify OTP and register
 const register = asyncHandler(async (req, res) => {
   const { phone, otp } = req.body;
+  console.log("Incoming registration request:", { phone, otp });
+
   const { success } = verifyOtpSchema.safeParse(req.body);
-  if (!success) throw new ApiError("Please enter correct fields", 400);
+  if (!success) {
+    console.error("Validation failed:", verifyOtpSchema.safeParse.errors);
+    throw new ApiError("Please enter correct fields", 400);
+  }
 
   const user = await User.findOne({ phone });
-  if (!user) throw new ApiError("No user existed", 409);
+  if (!user) {
+    console.error("User not found:", phone);
+    throw new ApiError("No user existed", 409);
+  }
 
   const verifyOtpSuccess = await user.verifyOTP(otp);
-  if (!verifyOtpSuccess) throw new ApiError("Invalid OTP", 401);
+  if (!verifyOtpSuccess) {
+    console.error("Invalid OTP for user:", phone);
+    throw new ApiError("Invalid OTP", 401);
+  }
 
   await user.save();
 
+  // Generating tokens
   let { accessToken, refreshToken } = await generateAccessAndRefreshToken(
     user._id
   );
+  console.log("Tokens generated:", { accessToken, refreshToken });
 
-  const options = {
-    httpOnly: true,
-    secure: true,
-  };
+  const options = { httpOnly: true, secure: true };
   return res
     .status(200)
     .cookie("accessToken", accessToken, options)
