@@ -9,7 +9,25 @@ import {
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 import twilio from "twilio";
-import { z } from "zod";
+
+const accountSid = process.env.TWILIO_ACCOUNT_SID;
+const authToken = process.env.TWILIO_AUTH_TOKEN;
+const twilioClient = twilio(accountSid, authToken);
+const twilioPhoneNumber = process.env.TWILIO_PHONE_NUMBER;
+
+const generateAccessAndRefreshToken = async (userId) => {
+  try {
+    const user = await User.findById(userId);
+    const accessToken = user.generateAccessToken();
+    const refreshToken = user.generateRefreshToken();
+
+    user.refreshToken = refreshToken;
+    await user.save({ validateBeforeSave: false });
+    return { accessToken, refreshToken };
+  } catch (err) {
+    throw new Error(500, "Error generating access and refresh token");
+  }
+};
 
 const requestOtp = asyncHandler(async (req, res) => {
   const { countryCode, phone } = req.body;

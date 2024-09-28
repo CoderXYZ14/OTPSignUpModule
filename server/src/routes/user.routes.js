@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { register, requestOtp } from "../controllers/user.controller";
+import { register, requestOtp } from "../controllers/user.controller.js";
 
 const router = Router();
 router.route("/request-otp").post(requestOtp);
