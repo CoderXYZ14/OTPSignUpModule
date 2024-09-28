@@ -17,8 +17,13 @@ export const requestOtpSchema = z.object({
 });
 
 // Schema for verifying OTP
-
 export const verifyOtpSchema = z.object({
-  phone: z.string().min(10, "Phone number is invalid").max(15),
-  otp: z.string().length(4, "OTP should be a 4-digit code"), // or z.number().int().min(1000).max(9999)
+  phone: z
+    .string()
+    .length(13, "Phone number must be exactly 13 characters long")
+    .regex(/^\+91\d{10}$/, "Phone number must be in the format +91XXXXXXXXXX"),
+  otp: z
+    .string()
+    .length(4, "OTP must be exactly 4 digits long")
+    .regex(/^\d{4}$/, "OTP must contain only four digits"),
 });

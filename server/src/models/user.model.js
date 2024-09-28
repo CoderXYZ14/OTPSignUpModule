@@ -53,8 +53,8 @@ userSchema.methods.verifyOTP = async function (inputOtp) {
 
   if (isOtpValid && !isExpired) {
     this.isVerified = true;
-    this.otp = undefined; // Clear OTP after verification
-    this.otpExpires = undefined; // Clear expiration after verification
+    this.otp = undefined;
+    this.otpExpires = undefined;
   }
 
   return isOtpValid && !isExpired;
