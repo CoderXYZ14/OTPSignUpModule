@@ -6,8 +6,6 @@ import {
   requestOtpSchema,
   verifyOtpSchema,
 } from "../validators/userValidator.js";
-import jwt from "jsonwebtoken";
-import mongoose from "mongoose";
 import twilio from "twilio";
 
 const accountSid = process.env.TWILIO_ACCOUNT_SID;
@@ -38,7 +36,7 @@ const requestOtp = asyncHandler(async (req, res) => {
   const fullPhone = `${countryCode}${phone}`;
   const existingUser = await User.findOne({ phone: fullPhone });
   if (existingUser) {
-    throw new ApiError("User already exists", 409);
+    throw new ApiError(409, "User already exists");
   }
 
   const user = new User({ phone: fullPhone });
@@ -54,13 +52,13 @@ const requestOtp = asyncHandler(async (req, res) => {
 const register = asyncHandler(async (req, res) => {
   const { phone, otp } = req.body;
   const { success } = verifyOtpSchema.safeParse(req.body);
-  if (!success) throw new ApiError("Please enter correct fields", 400);
+  if (!success) throw new ApiError(400, "Please enter correct fields");
 
   const user = await User.findOne({ phone });
-  if (!user) throw new ApiError("No user existed", 409);
+  if (!user) throw new ApiError(409, "No user existed");
 
   const verifyOtpSuccess = await user.verifyOTP(otp);
-  if (!verifyOtpSuccess) throw new ApiError("Invalid OTP", 401);
+  if (!verifyOtpSuccess) throw new ApiError(401, "Invalid OTP");
 
   await user.save();
 
@@ -84,4 +82,5 @@ const register = asyncHandler(async (req, res) => {
       )
     );
 });
+
 export { requestOtp, register };

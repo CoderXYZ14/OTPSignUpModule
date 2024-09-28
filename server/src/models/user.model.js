@@ -12,10 +12,11 @@ const userSchema = new Schema(
     },
     otp: {
       type: String,
-      required: true,
+      required: false,
     },
     otpExpires: {
       type: Date,
+      required: false,
     },
     isVerified: {
       type: Boolean,
@@ -45,15 +46,17 @@ userSchema.methods.generateAndSendOTP = async function (
   return otpCode;
 };
 
+// User model
 userSchema.methods.verifyOTP = async function (inputOtp) {
-  const isOtpValid = await bcrypt.compare(inputOtp, this.otpHash);
+  const isOtpValid = await bcrypt.compare(inputOtp, this.otp);
   const isExpired = this.otpExpires < Date.now();
 
   if (isOtpValid && !isExpired) {
     this.isVerified = true;
-    this.otpHash = undefined;
-    this.otpExpires = undefined;
+    this.otp = undefined; // Clear OTP after verification
+    this.otpExpires = undefined; // Clear expiration after verification
   }
+
   return isOtpValid && !isExpired;
 };
 
