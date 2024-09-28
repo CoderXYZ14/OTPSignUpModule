@@ -5,10 +5,6 @@ import bcrypt from "bcryptjs";
 
 const userSchema = new Schema(
   {
-    countryCode: {
-      type: String,
-      required: true,
-    },
     phone: {
       type: String,
       required: true,
