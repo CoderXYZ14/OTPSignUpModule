@@ -58,7 +58,11 @@ const VerifyOTP = () => {
       );
 
       if (response.status === 200) {
-        const { accessToken, refreshToken, user } = response.data.data;
+        const { accessToken, refreshToken } = response.data.data;
+        console.log("Access token:", accessToken);
+        localStorage.setItem("accessToken", accessToken);
+        localStorage.setItem("refreshToken", refreshToken);
+
         setSuccessMessage("Sign up successful!");
         alert("Sign up successful!");
 
