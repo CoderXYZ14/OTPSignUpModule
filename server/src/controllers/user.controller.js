@@ -66,4 +66,4 @@ const register = asyncHandler(async (req, res) => {
       )
     );
 });
-export { requestOtp };
+export { requestOtp, register };

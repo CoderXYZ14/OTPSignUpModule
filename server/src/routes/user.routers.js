@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { requestOtp } from "../controllers/user.controller";
+import { register, requestOtp } from "../controllers/user.controller";
 
 const router = Router();
 router.route("/request-otp").post(requestOtp);
+router.route("/register").post(register);
 export default router;
