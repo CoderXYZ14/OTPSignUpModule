@@ -8,8 +8,7 @@ const Header = () => {
   const location = useLocation();
 
   const handleSignUp = () => {
-    // Simulating sign-up process
-    navigate("/sign-in");
+    navigate("/sign-up");
   };
 
   return (
@@ -22,7 +21,7 @@ const Header = () => {
         />
         <h1 className="text-2xl font-bold">Register</h1>
       </div>
-      {/* Hide the Sign Up button on the sign-in page */}
+
       {location.pathname !== "/sign-in" && !isSignedUp && (
         <Button
           onClick={handleSignUp}

@@ -1,6 +1,8 @@
-import { Input } from "@/components/ui/input";
-import { Loader2 } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -8,15 +10,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { countryCodeData } from "../../utils/countrycode.js";
 import { Button } from "@/components/ui/button";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import { Loader2 } from "lucide-react";
+
+import { countryCodeData } from "../../utils/countrycode.js";
 import { usePhoneInfo } from "@/context/phoneContext.jsx";
 import { Heading } from "../extra-comp/Heading.jsx";
 import { SubHeading } from "../extra-comp/SubHeading.jsx";
 
-const Signin = () => {
+const Signup = () => {
   const { setPhoneInfo } = usePhoneInfo();
   const [phone, setPhone] = useState("");
   const [countryCode, setCountryCode] = useState("");
@@ -32,7 +34,7 @@ const Signin = () => {
     }
 
     setLoading(true);
-    setErrorMessage(""); // Clear any previous error messages
+    setErrorMessage("");
     try {
       const response = await axios.post(
         "http://localhost:8080/api/v1/users/request-otp",
@@ -42,7 +44,6 @@ const Signin = () => {
         }
       );
 
-      // Check for a successful response
       if (response.status === 200) {
         setPhoneInfo({ phone, countryCode });
         navigate("/verify-otp");
@@ -50,7 +51,7 @@ const Signin = () => {
     } catch (error) {
       setErrorMessage(
         "Invalid phone number or country code. Please try again."
-      ); // Set error message
+      );
       console.error(error);
     } finally {
       setLoading(false);
@@ -86,7 +87,7 @@ const Signin = () => {
             />
           </div>
           {errorMessage && (
-            <p className="text-red-500 text-sm mt-2">{errorMessage}</p> // Display error message
+            <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
           )}
           <div className="pt-4">
             <Button
@@ -103,4 +104,4 @@ const Signin = () => {
   );
 };
 
-export default Signin;
+export default Signup;

@@ -1,4 +1,6 @@
-import React, { useState, useContext } from "react";
+import { useState, useContext } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import {
   InputOTP,
   InputOTPGroup,
@@ -12,28 +14,27 @@ import {
 } from "@/components/ui/hover-card";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
-import axios from "axios";
+
 import { PhoneInfoContext } from "@/context/phoneContext";
 import { Heading, SubHeading } from "../extra-comp";
-import { useNavigate } from "react-router-dom";
 
 const VerifyOTP = () => {
   const { phoneInfo } = useContext(PhoneInfoContext);
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-  const navigate = useNavigate();
-  const [errorMessage, setErrorMessage] = useState("");
-  const [successMessage, setSuccessMessage] = useState("");
 
   const [phone, setPhone] = useState(phoneInfo?.phone || "");
   const [countryCode, setCountryCode] = useState(
-    phoneInfo?.countryCode || "+1"
+    phoneInfo?.countryCode || "+91"
   );
 
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const navigate = useNavigate();
   const handleOtpChange = (value) => {
     setOtp(value);
-    // Reset success and error messages when OTP changes
     setSuccessMessage("");
     setErrorMessage("");
   };
@@ -43,10 +44,9 @@ const VerifyOTP = () => {
       setErrorMessage("OTP is required");
       return;
     }
-
     setLoading(true);
-    setErrorMessage(""); // Clear any previous error messages
-    setSuccessMessage(""); // Clear any previous success messages
+    setErrorMessage("");
+    setSuccessMessage("");
 
     try {
       const response = await axios.post(
@@ -59,19 +59,18 @@ const VerifyOTP = () => {
 
       if (response.status === 200) {
         const { accessToken, refreshToken, user } = response.data.data;
-        setSuccessMessage("Sign in successful!"); // Set the success message
-        alert("Sign in successful!"); // Show success alert
+        setSuccessMessage("Sign up successful!");
+        alert("Sign up successful!");
 
-        // Wait for 1 second before navigating
         setTimeout(() => {
-          navigate("/"); // Navigate to the main page
+          navigate("/");
         }, 1000);
 
         console.log("OTP verified successfully");
       }
     } catch (error) {
-      setErrorMessage("Invalid OTP. Please try again."); // Set the error message
-      alert("Invalid OTP. Please try again."); // Show error alert
+      setErrorMessage("Invalid OTP. Please try again.");
+      alert("Invalid OTP. Please try again.");
       console.error(error);
     } finally {
       setLoading(false);
@@ -101,11 +100,11 @@ const VerifyOTP = () => {
         </div>
 
         {errorMessage && (
-          <p className="text-red-500 text-sm mt-2">{errorMessage}</p> // Display error message
+          <p className="text-red-500 text-sm mt-2">{errorMessage}</p>
         )}
 
         {successMessage && (
-          <p className="text-green-500 text-sm mt-4">{successMessage}</p> // Display success message
+          <p className="text-green-500 text-sm mt-4">{successMessage}</p>
         )}
 
         <div className="flex items-center justify-center space-x-2 mt-4">

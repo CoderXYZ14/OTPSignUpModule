@@ -12,5 +12,4 @@ export const PhoneInfoProvider = ({ children }) => {
   );
 };
 
-// Custom hook for easy access to the context
 export const usePhoneInfo = () => useContext(PhoneInfoContext);
