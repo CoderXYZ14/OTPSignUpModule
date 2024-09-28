@@ -22,16 +22,18 @@ const Signin = () => {
   const [phone, setPhone] = useState("");
   const [countryCode, setCountryCode] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
   const navigate = useNavigate();
 
   const requestOtp = async () => {
     if (!phone || !countryCode) {
-      // Add some validation logic (e.g., alert or message)
-      console.error("Phone number and country code are required");
+      setErrorMessage("Phone number and country code are required");
       return;
     }
 
     setLoading(true);
+    setErrorMessage(""); // Clear any previous error messages
     try {
       const response = await axios.post(
         "http://localhost:8080/api/v1/users/request-otp",
@@ -41,14 +43,16 @@ const Signin = () => {
         }
       );
 
-      // Check for a successful response here
+      // Check for a successful response
       if (response.status === 200) {
         setPhoneInfo({ phone, countryCode });
         navigate("/verify-otp");
       }
     } catch (error) {
+      setErrorMessage(
+        "Invalid phone number or country code. Please try again."
+      ); // Set error message
       console.error(error);
-      // Optionally display an error message to the user
     } finally {
       setLoading(false);
     }
@@ -81,6 +85,9 @@ const Signin = () => {
               label="phone"
               className="w-full text-sm"
             />
+            {errorMessage && (
+              <p className="text-red-500 text-sm mt-2">{errorMessage}</p> // Display error message
+            )}
             <div className="pt-4">
               <div className="flex justify-end gap-5">
                 <Button disabled={!phone || loading} onClick={requestOtp}>

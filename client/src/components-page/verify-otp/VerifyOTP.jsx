@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import {
   InputOTP,
   InputOTPGroup,
@@ -23,21 +23,31 @@ const VerifyOTP = () => {
   const [loading, setLoading] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const navigate = useNavigate();
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
 
   const [phone, setPhone] = useState(phoneInfo?.phone || "");
   const [countryCode, setCountryCode] = useState(
     phoneInfo?.countryCode || "+1"
   );
 
-  const handleOtpChange = (value) => setOtp(value);
+  const handleOtpChange = (value) => {
+    setOtp(value);
+    // Reset success and error messages when OTP changes
+    setSuccessMessage("");
+    setErrorMessage("");
+  };
 
   const verifyOtp = async () => {
     if (!otp) {
-      console.error("OTP is required");
+      setErrorMessage("OTP is required");
       return;
     }
 
     setLoading(true);
+    setErrorMessage(""); // Clear any previous error messages
+    setSuccessMessage(""); // Clear any previous success messages
+
     try {
       const response = await axios.post(
         "http://localhost:8080/api/v1/users/register",
@@ -49,10 +59,19 @@ const VerifyOTP = () => {
 
       if (response.status === 200) {
         const { accessToken, refreshToken, user } = response.data.data;
-        navigate("/");
+        setSuccessMessage("Sign in successful!"); // Set the success message
+        alert("Sign in successful!"); // Show success alert
+
+        // Wait for 1 second before navigating
+        setTimeout(() => {
+          navigate("/"); // Navigate to the main page
+        }, 1000);
+
         console.log("OTP verified successfully");
       }
     } catch (error) {
+      setErrorMessage("Invalid OTP. Please try again."); // Set the error message
+      alert("Invalid OTP. Please try again."); // Show error alert
       console.error(error);
     } finally {
       setLoading(false);
@@ -80,6 +99,14 @@ const VerifyOTP = () => {
             </InputOTPGroup>
           </InputOTP>
         </div>
+
+        {errorMessage && (
+          <p className="text-red-500 text-sm mt-2">{errorMessage}</p> // Display error message
+        )}
+
+        {successMessage && (
+          <p className="text-green-500 text-sm mt-4">{successMessage}</p> // Display success message
+        )}
 
         <div className="flex items-center justify-center space-x-2 mt-4">
           <input
