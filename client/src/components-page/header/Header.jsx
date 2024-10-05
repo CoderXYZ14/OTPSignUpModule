@@ -1,24 +1,35 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "@/store/authSlice";
 
 const Header = () => {
-  const [isSignedUp, setIsSignedUp] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const dispatch = useDispatch();
+
+  // Access the authentication status from the Redux store
+  const isSignedUp = useSelector((state) => state.auth.status);
 
   // Check if accessToken is present in local storage on component mount
   useEffect(() => {
     const token = localStorage.getItem("accessToken");
-    setIsSignedUp(!!token); // Set isSignedUp to true if token exists
-  }, []);
+    if (token && !isSignedUp) {
+      // If there's a token but the Redux status is false, you may want to log in
+      // This can be handled depending on your use case (e.g., auto-login or a different approach)
+    }
+  }, [isSignedUp]);
 
   const handleSignUp = () => {
     navigate("/sign-up");
   };
 
   const handleSignOut = async () => {
+    const confirmSignOut = window.confirm("Are you sure you want to sign out?");
+    if (!confirmSignOut) return;
+
     try {
       const token = localStorage.getItem("accessToken");
       await axios.post(
@@ -35,7 +46,8 @@ const Header = () => {
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
 
-      setIsSignedUp(false);
+      // Dispatch logout action to clear auth state
+      dispatch(logout());
 
       // Redirect to the sign-in page
       navigate("/");
@@ -43,19 +55,6 @@ const Header = () => {
       console.error("Error logging out:", error);
     }
   };
-
-  // Update isSignedUp state when token is added to local storage
-  useEffect(() => {
-    const checkTokenOnSignUp = () => {
-      const token = localStorage.getItem("accessToken");
-      setIsSignedUp(!!token);
-    };
-
-    window.addEventListener("storage", checkTokenOnSignUp);
-    return () => {
-      window.removeEventListener("storage", checkTokenOnSignUp);
-    };
-  }, []);
 
   return (
     <div className="bg-black text-white p-4 flex justify-between items-center shadow-md">
