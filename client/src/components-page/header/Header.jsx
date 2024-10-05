@@ -1,26 +1,14 @@
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "@/store/authSlice";
 
 const Header = () => {
   const navigate = useNavigate();
-  const location = useLocation();
   const dispatch = useDispatch();
-
-  // Access the authentication status from the Redux store
   const isSignedUp = useSelector((state) => state.auth.status);
-
-  // Check if accessToken is present in local storage on component mount
-  useEffect(() => {
-    const token = localStorage.getItem("accessToken");
-    if (token && !isSignedUp) {
-      // If there's a token but the Redux status is false, you may want to log in
-      // This can be handled depending on your use case (e.g., auto-login or a different approach)
-    }
-  }, [isSignedUp]);
 
   const handleSignUp = () => {
     navigate("/sign-up");
@@ -42,14 +30,10 @@ const Header = () => {
         }
       );
 
-      // Clear tokens from localStorage
       localStorage.removeItem("accessToken");
       localStorage.removeItem("refreshToken");
 
-      // Dispatch logout action to clear auth state
       dispatch(logout());
-
-      // Redirect to the sign-in page
       navigate("/");
     } catch (error) {
       console.error("Error logging out:", error);
@@ -67,26 +51,27 @@ const Header = () => {
         <h1 className="text-2xl font-bold">Register</h1>
       </div>
 
-      {location.pathname !== "/sign-in" && (
-        <div>
-          <Button
-            onClick={handleSignUp}
-            className={`bg-gray-800 hover:bg-gray-700 text-white ${
-              isSignedUp ? "hidden" : ""
-            }`}
-          >
-            Sign Up
-          </Button>
-          <Button
-            onClick={handleSignOut}
-            className={`bg-red-600 hover:bg-red-500 text-white ${
-              !isSignedUp ? "hidden" : ""
-            }`}
-          >
-            Sign Out
-          </Button>
-        </div>
-      )}
+      {location.pathname !== "/sign-up" &&
+        location.pathname !== "/verify-otp" && (
+          <div>
+            <Button
+              onClick={handleSignUp}
+              className={`bg-gray-800 hover:bg-gray-700 text-white ${
+                isSignedUp ? "hidden" : ""
+              }`}
+            >
+              Sign Up
+            </Button>
+            <Button
+              onClick={handleSignOut}
+              className={`bg-red-600 hover:bg-red-500 text-white ${
+                !isSignedUp ? "hidden" : ""
+              }`}
+            >
+              Sign Out
+            </Button>
+          </div>
+        )}
     </div>
   );
 };

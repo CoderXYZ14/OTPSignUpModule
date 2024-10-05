@@ -3,7 +3,7 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   status: false,
   userData: null,
-  phone: null, // Storing the full phone number
+  phone: null,
 };
 
 const authSlice = createSlice({
@@ -17,10 +17,10 @@ const authSlice = createSlice({
     logout: (state) => {
       state.status = false;
       state.userData = null;
-      state.phone = null; // Reset phone on logout
+      state.phone = null;
     },
     setPhone: (state, action) => {
-      state.phone = action.payload; // New action to set the full phone number
+      state.phone = action.payload;
     },
   },
 });

@@ -16,12 +16,12 @@ import { Loader2, LogIn, Terminal } from "lucide-react";
 
 import { countryCodeData } from "../../utils/countrycode.js";
 import { useDispatch } from "react-redux";
-import { setPhone } from "../../store/authSlice.js"; // Import the setPhone action
+import { setPhone } from "../../store/authSlice.js";
 import { Heading } from "../extra-comp/Heading.jsx";
 import { SubHeading } from "../extra-comp/SubHeading.jsx";
 
 const Signup = () => {
-  const [phone, setPhoneState] = useState(""); // Renamed to avoid confusion
+  const [phone, setPhoneState] = useState("");
   const [countryCode, setCountryCode] = useState("");
   const [loading, setLoading] = useState(false);
   const [alert, setAlert] = useState({ show: false, message: "", type: "" });
@@ -31,7 +31,6 @@ const Signup = () => {
   const requestOtp = async (e) => {
     e.preventDefault();
 
-    // Check if phone or country code is missing
     if (!phone || !countryCode) {
       setAlert({
         show: true,
@@ -43,19 +42,18 @@ const Signup = () => {
 
     setLoading(true);
     try {
-      // Concatenate country code and phone
       const fullPhoneNumber = `${countryCode}${phone}`;
 
       const response = await axios.post(
         "http://localhost:8080/api/v1/users/request-otp",
         {
-          phone, // Send the full phone number
-          countryCode, // You can still send countryCode if needed
+          phone,
+          countryCode,
         }
       );
 
       if (response.status === 200) {
-        dispatch(setPhone(fullPhoneNumber)); // Dispatch the full phone number to Redux
+        dispatch(setPhone(fullPhoneNumber));
         setAlert({
           show: true,
           message: "Account created and logged in successfully!",
@@ -107,7 +105,7 @@ const Signup = () => {
               </SelectContent>
             </Select>
             <Input
-              onChange={(e) => setPhoneState(e.target.value)} // Renamed to avoid confusion
+              onChange={(e) => setPhoneState(e.target.value)}
               placeholder="1234567890"
               label="phone"
               className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"

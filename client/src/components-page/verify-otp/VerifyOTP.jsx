@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import axios from "axios";
@@ -15,14 +15,14 @@ import {
 } from "@/components/ui/hover-card";
 import { Button } from "@/components/ui/button";
 import { Loader2, LogIn } from "lucide-react";
-import { setPhone, login } from "../../store/authSlice"; // Make sure to import login
+import { login } from "../../store/authSlice";
 import { Heading, SubHeading } from "../extra-comp";
 
 const VerifyOTP = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const phone = useSelector((state) => state.auth.phone); // Access phone from Redux store
+  const phone = useSelector((state) => state.auth.phone);
 
   const [formData, setFormData] = useState({
     otp: "",
@@ -84,8 +84,7 @@ const VerifyOTP = () => {
           message: "Sign up successful!",
           type: "success",
         });
-        dispatch(login({ userData: user })); // Update here to pass userData
-
+        dispatch(login({ userData: user }));
         setTimeout(() => {
           navigate("/");
         }, 1000);
